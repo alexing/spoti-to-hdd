@@ -1,7 +1,8 @@
-from time import sleep
 from typing import Dict, Any, List, Tuple
 
 import slskd_api
+
+from secrets import SLSKD_USERNAME, SLSKD_PASSWORD
 
 host = 'http://localhost:5030'
 api_key = 'e45f17a4c8e2b302da89f3e8f906e5cd'
@@ -10,7 +11,7 @@ api_key = 'e45f17a4c8e2b302da89f3e8f906e5cd'
 class Slskd:
 
     def __init__(self):
-        self.api = slskd_api.SlskdClient(host, username='slskd', password='slskd')
+        self.api = slskd_api.SlskdClient(host, username=SLSKD_USERNAME, password=SLSKD_PASSWORD)
         print(self.api)
 
     def search(self, query: str) -> str:
@@ -76,16 +77,3 @@ class Slskd:
 
     def start_download(self, track: Tuple[str, Dict[str, Any]]) -> bool:
         return self.api.transfers.enqueue(*track)
-
-
-if __name__ == "__main__":
-    slskd = Slskd()
-    results_id = slskd.search("new light john mayer")
-    while not slskd.is_search_complete(results_id):
-        sleep(3)
-
-    results = slskd.get_results(results_id)
-    print(results)
-    best_result = slskd.pop_best_result(results)
-
-    print(slskd.start_download(best_result))
