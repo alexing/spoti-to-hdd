@@ -77,3 +77,21 @@ class Slskd:
 
     def start_download(self, track: Tuple[str, Dict[str, Any]]) -> bool:
         return self.api.transfers.enqueue(*track)
+
+    def get_all_downloads(self, including_removed: bool = False):
+        return self.api.transfers.get_all_downloads(includeRemoved=including_removed)
+
+    def get_all_failed_downloads(self, including_removed: bool = False):
+        all_downloads = self.get_all_downloads(including_removed=including_removed)
+
+        result = []
+        for user in all_downloads:
+            username = user['username']
+            files = []
+            for directory in user['directories']:
+                for file in directory['files']:
+                    if 'queued' in file['state'].lower() or 'errored' in file['state'].lower():
+                        files.append(file)
+            if files:
+                result.append((username, files))
+        return result
